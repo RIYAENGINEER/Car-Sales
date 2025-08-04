@@ -1,0 +1,30 @@
+#Data cleaning and preprocessing
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder #scikit learn
+
+df=pd.read_csv("/content/Car_sales.csv")
+df_LableEncoder=LabelEncoder() #to change object data to numerical (ascii)
+print(df) # initial - 157 rows × 16 columns
+
+#date formatted
+df["Latest_Launch"]=pd.to_datetime(df["Latest_Launch"],format="%m/%d/%Y")
+
+#look for Nan values
+print(df.isnull().sum())
+
+#drop __year_resale_value,Price_in_thousands,Fuel_efficiency,Curb_weight
+df_cl = df.dropna(subset=['__year_resale_value','Price_in_thousands','Fuel_efficiency','Curb_weight'])
+
+#fill Nan as 0.000 in '__year_resale_value'
+df['__year_resale_value'] = df['__year_resale_value'].fillna(0)  # or 'unknown', 999, etc.
+
+#Check for unique values in all columns
+for j in df.select_dtypes(include="object").columns:
+  print(j,df[j].unique())
+
+#change datatype from object to numeric
+for j in df.select_dtypes(include="object").columns:
+  df[j]=df_LableEncoder.fit_transform(df[j])
+
+#After preprocessing 
+print(df) #final - 152 rows × 16 columns
